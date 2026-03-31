@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "310762199244",
+    "project_id": "hoopradar-87b6c",
+    "storage_bucket": "hoopradar-87b6c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:310762199244:android:f6456925722f6470614a69",
+        "android_client_info": {
+          "package_name": "com.main.hoopradar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "310762199244-800n3u6e30uu4r3mm4ass2jls85j9757.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.main.hoopradar",
+            "certificate_hash": "cfa4333d19f32914e64ab9ba3c22a3492a54762a"
+          }
+        },
+        {
+          "client_id": "310762199244-j14bfjii55d6aoo2fsjt3srisnm1g94a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATTfen95jCaylPSBqSsNJLZag-YZVE1qM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "310762199244-j14bfjii55d6aoo2fsjt3srisnm1g94a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

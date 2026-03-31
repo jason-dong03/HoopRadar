@@ -1,4 +1,11 @@
 package com.main.hoopradar.data.model
 
-class Court {
-}
+data class Court(
+    val id: String = "",
+    val name: String = "",
+    val address: String = "",
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0,
+    val photoUrl: String? = null,
+    val distanceMiles: Double? = null
+)
