@@ -1,6 +1,5 @@
 package com.main.hoopradar.ui.screen.profile
 
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.main.hoopradar.ui.common.AppScaffold
 import com.main.hoopradar.viewmodel.ProfileViewModel
 
 @Composable
@@ -22,17 +22,26 @@ fun ProfileScreen(
 ) {
     val profile by profileViewModel.profile.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        Text("Profile")
-        Text("Name: ${profile.name}")
-        Text("Email: ${profile.email}")
-        Text("Skill: ${profile.skillLevel}")
-        Button(onClick = { }) { Text("Update Profile Photo") }
-        Button(onClick = onBack) { Text("Back") }
+    AppScaffold(
+        title = "Profile",
+        showBackButton = true,
+        onBack = onBack
+    ) { padding ->
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text("Name: ${profile.name}")
+            Text("Email: ${profile.email}")
+            Text("Skill: ${profile.skillLevel}")
+
+            Button(onClick = { }) {
+                Text("Update Profile Photo")
+            }
+        }
     }
 }
