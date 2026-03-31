@@ -9,16 +9,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.main.hoopradar.ui.common.AppScaffold
 
 @Composable
 fun CourtDetailsScreen(
     onBack: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+    AppScaffold(
+        title = "Court Detail",
+        showBackButton = true,
+        onBack = onBack
     ) {
         Text("Court Details")
         Text("Name: Emmet Street Courts")

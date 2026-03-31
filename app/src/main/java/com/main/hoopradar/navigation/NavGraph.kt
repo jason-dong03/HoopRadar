@@ -36,12 +36,13 @@ fun NavGraph(navController: NavHostController) {
         }
         composable(Routes.NEARBY_COURTS) {
             NearbyCourtsScreen(
+                onBack = { navController.popBackStack() },
                 onCourtClick = { navController.navigate(Routes.COURT_DETAILS) },
                 onRunClick = { navController.navigate(Routes.RUN_DETAILS) }
             )
         }
         composable(Routes.CREATE_RUN) {
-            CreateRunScreen(onRunCreated = { navController.popBackStack() })
+            CreateRunScreen(onRunCreated = { navController.popBackStack() }, onBack = { navController.popBackStack()})
         }
         composable(Routes.RUN_DETAILS) {
             RunDetailsScreen(onBack = { navController.popBackStack() })
