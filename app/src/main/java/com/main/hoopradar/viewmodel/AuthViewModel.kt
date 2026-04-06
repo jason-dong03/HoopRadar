@@ -57,18 +57,24 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     private suspend fun saveUserToFirestore() {
         val user = auth.currentUser ?: return
+        val docRef = db.collection("users").document(user.uid)
+        val snapshot = docRef.get().await()
 
-        val userMap = mapOf(
-            "uid" to user.uid,
-            "name" to (user.displayName ?: ""),
-            "email" to (user.email ?: ""),
-            "photoUrl" to (user.photoUrl?.toString() ?: "")
-        )
-
-        db.collection("users")
-            .document(user.uid)
-            .set(userMap)
-            .await()
+        if (!snapshot.exists()) {
+            docRef.set(mapOf(
+                "uid" to user.uid,
+                "name" to (user.displayName ?: ""),
+                "email" to (user.email ?: ""),
+                "photoUrl" to (user.photoUrl?.toString() ?: ""),
+                "skillLevel" to "Beginner"
+            )).await()
+        } else {
+            docRef.update(mapOf(
+                "name" to (user.displayName ?: ""),
+                "email" to (user.email ?: ""),
+                "photoUrl" to (user.photoUrl?.toString() ?: "")
+            )).await()
+        }
     }
 
     fun signOut() {

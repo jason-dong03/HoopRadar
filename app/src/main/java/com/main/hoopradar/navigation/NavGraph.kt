@@ -1,23 +1,29 @@
 package com.main.hoopradar.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import com.main.hoopradar.ui.screen.court.CourtDetailsScreen
 import com.main.hoopradar.ui.screen.home.HomeScreen
 import com.main.hoopradar.ui.screen.login.LoginScreen
 import com.main.hoopradar.ui.screen.map.NearbyCourtsScreen
 import com.main.hoopradar.ui.screen.profile.ProfileScreen
 import com.main.hoopradar.ui.screen.run.CreateRunScreen
+import com.main.hoopradar.ui.screen.run.RunChatScreen
 import com.main.hoopradar.ui.screen.run.RunDetailsScreen
-import com.main.hoopradar.ui.screen.court.CourtDetailsScreen
+import com.main.hoopradar.viewmodel.RunsViewModel
 
 @Composable
 fun NavGraph(navController: NavHostController) {
-    NavHost(
-        navController = navController,
-        startDestination = Routes.LOGIN
-    ) {
+    val runsViewModel: RunsViewModel = viewModel()
+
+    NavHost(navController = navController, startDestination = Routes.LOGIN) {
         composable(Routes.LOGIN) {
             LoginScreen(
                 onLoginSuccess = {
@@ -31,27 +37,72 @@ fun NavGraph(navController: NavHostController) {
             HomeScreen(
                 onNearbyCourtsClick = { navController.navigate(Routes.NEARBY_COURTS) },
                 onCreateRunClick = { navController.navigate(Routes.CREATE_RUN) },
-                onProfileClick = { navController.navigate(Routes.PROFILE) }
+                onProfileClick = { navController.navigate(Routes.PROFILE) },
+                onRunChatClick = { runId, courtName ->
+                    navController.navigate(Routes.runChat(runId, courtName))
+                },
+                runsViewModel = runsViewModel
             )
         }
         composable(Routes.NEARBY_COURTS) {
             NearbyCourtsScreen(
                 onBack = { navController.popBackStack() },
                 onCourtClick = { navController.navigate(Routes.COURT_DETAILS) },
-                onRunClick = { navController.navigate(Routes.RUN_DETAILS) }
+                onRunClick = { runId -> navController.navigate(Routes.runDetails(runId)) },
+                runsViewModel = runsViewModel
             )
         }
         composable(Routes.CREATE_RUN) {
-            CreateRunScreen(onRunCreated = { navController.popBackStack() }, onBack = { navController.popBackStack()})
+            CreateRunScreen(
+                onRunCreated = { navController.popBackStack() },
+                onBack = { navController.popBackStack() },
+                runsViewModel = runsViewModel
+            )
         }
-        composable(Routes.RUN_DETAILS) {
-            RunDetailsScreen(onBack = { navController.popBackStack() })
+        composable(
+            route = Routes.RUN_DETAILS,
+            arguments = listOf(navArgument("runId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val runId = backStackEntry.arguments?.getString("runId") ?: ""
+            val runs by runsViewModel.runs.collectAsState()
+            val run = runs.find { it.id == runId }
+            if (run != null) {
+                RunDetailsScreen(
+                    run = run,
+                    onBack = { navController.popBackStack() },
+                    runsViewModel = runsViewModel
+                )
+            }
+        }
+        composable(
+            route = Routes.RUN_CHAT,
+            arguments = listOf(
+                navArgument("runId") { type = NavType.StringType },
+                navArgument("courtName") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val runId = backStackEntry.arguments?.getString("runId") ?: ""
+            val courtName = java.net.URLDecoder.decode(
+                backStackEntry.arguments?.getString("courtName") ?: "", "UTF-8"
+            )
+            RunChatScreen(
+                runId = runId,
+                courtName = courtName,
+                onBack = { navController.popBackStack() }
+            )
         }
         composable(Routes.COURT_DETAILS) {
             CourtDetailsScreen(onBack = { navController.popBackStack() })
         }
         composable(Routes.PROFILE) {
-            ProfileScreen(onBack = { navController.popBackStack() })
+            ProfileScreen(
+                onBack = { navController.popBackStack() },
+                onSignOut = {
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
         }
     }
 }

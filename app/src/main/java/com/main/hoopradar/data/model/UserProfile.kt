@@ -2,7 +2,7 @@ package com.main.hoopradar.data.model
 
 
 data class UserProfile(
-    val id: String = "",
+    val uid: String = "",
     val name: String = "",
     val email: String = "",
     val photoUrl: String? = null,
