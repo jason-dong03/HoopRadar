@@ -11,42 +11,42 @@ import kotlinx.coroutines.tasks.await
 
 import com.main.hoopradar.data.remote.FirebaseModule
 
-data class AuthUiState(
-    val isLoading: Boolean = false,
-    val isSignedIn: Boolean = false,
-    val errorMessage: String? = null
+data class AuthUiState( // holds ui state for authentication screen
+    val isLoading: Boolean = false, // true while sign in request is running
+    val isSignedIn: Boolean = false, // true when usr is signed in
+    val errorMessage: String? = null // stores login error message if one occurs
 )
 
-class AuthViewModel(application: Application) : AndroidViewModel(application) {
+class AuthViewModel(application: Application) : AndroidViewModel(application) { // viewmodel that manages login/logout logic
 
 
-    private val auth = FirebaseModule.auth
-    private val db = FirebaseModule.firestore
-    private val googleAuthClient = GoogleAuthClient(application, auth)
+    private val auth = FirebaseModule.auth // firebase authentication instance
+    private val db = FirebaseModule.firestore // firestore database instance
+    private val googleAuthClient = GoogleAuthClient(application, auth) // google sign in helper class
 
-    private val _uiState = MutableStateFlow(
+    private val _uiState = MutableStateFlow( // mutable authentication state
         AuthUiState(isSignedIn = auth.currentUser != null)
     )
-    val uiState: StateFlow<AuthUiState> = _uiState
+    val uiState: StateFlow<AuthUiState> = _uiState // read only state exposed to ui
 
-    fun signInWithGoogle(webClientId: String) {
+    fun signInWithGoogle(webClientId: String) { // starts google sign in process
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(
+            _uiState.value = _uiState.value.copy( // show loading spinner and clear errors
                 isLoading = true,
                 errorMessage = null
             )
 
-            val result = googleAuthClient.signIn(webClientId)
+            val result = googleAuthClient.signIn(webClientId) // attempt google sign in
 
             _uiState.value = if (result.isSuccess) {
-                saveUserToFirestore()
-                AuthUiState(
+                saveUserToFirestore() // save user info in firestore
+                AuthUiState( // update ui as signed in
                     isLoading = false,
                     isSignedIn = true,
                     errorMessage = null
                 )
             } else {
-                AuthUiState(
+                AuthUiState( // show error if sign in failed
                     isLoading = false,
                     isSignedIn = false,
                     errorMessage = result.exceptionOrNull()?.message
@@ -55,12 +55,12 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private suspend fun saveUserToFirestore() {
+    private suspend fun saveUserToFirestore() { // saves signed in user data to firestore
         val user = auth.currentUser ?: return
         val docRef = db.collection("users").document(user.uid)
         val snapshot = docRef.get().await()
 
-        if (!snapshot.exists()) {
+        if (!snapshot.exists()) { // if first login, create new profile document
             docRef.set(mapOf(
                 "uid" to user.uid,
                 "name" to (user.displayName ?: ""),
@@ -68,7 +68,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 "photoUrl" to (user.photoUrl?.toString() ?: ""),
                 "skillLevel" to "Beginner"
             )).await()
-        } else {
+        } else { // if returning user, update profile info
             docRef.update(mapOf(
                 "name" to (user.displayName ?: ""),
                 "email" to (user.email ?: ""),
@@ -77,8 +77,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun signOut() {
+    fun signOut() { // signs current user out
         googleAuthClient.signOut()
-        _uiState.value = AuthUiState(isSignedIn = false)
+        _uiState.value = AuthUiState(isSignedIn = false) // reset ui state
     }
 }

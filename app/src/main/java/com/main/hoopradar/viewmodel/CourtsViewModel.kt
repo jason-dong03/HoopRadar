@@ -8,22 +8,22 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class CourtsViewModel : ViewModel() {
+class CourtsViewModel : ViewModel() { // viewmodel that manages basketball court data for the ui
 
-    private val repo = CourtRepository()
+    private val repo = CourtRepository() // repository used to fetch court data from firestore
 
-    private val _courts = MutableStateFlow<List<Court>>(emptyList())
-    val courts: StateFlow<List<Court>> = _courts
+    private val _courts = MutableStateFlow<List<Court>>(emptyList()) // holds list of courts
+    val courts: StateFlow<List<Court>> = _courts // read only state exposed to ui
 
-    init {
+    init { // load courts when viewmodel is created
         loadCourts()
     }
 
-    private fun loadCourts() {
+    private fun loadCourts() { // loads court data from repository
         viewModelScope.launch {
-            try {
+            try { // update state with courts from firestore
                 _courts.value = repo.getCourts()
-            } catch (e: Exception) {
+            } catch (e: Exception) { // print error if loading fails
                 e.printStackTrace()
             }
         }

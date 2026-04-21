@@ -20,20 +20,20 @@ import com.main.hoopradar.ui.screen.run.RunDetailsScreen
 import com.main.hoopradar.viewmodel.RunsViewModel
 
 @Composable
-fun NavGraph(navController: NavHostController) {
-    val runsViewModel: RunsViewModel = viewModel()
+fun NavGraph(navController: NavHostController) { // defines all app navigation routes and screens
+    val runsViewModel: RunsViewModel = viewModel() // shared viewmodel for run related screens
 
-    NavHost(navController = navController, startDestination = Routes.LOGIN) {
-        composable(Routes.LOGIN) {
+    NavHost(navController = navController, startDestination = Routes.LOGIN) { // navhost manages navigation between app screens
+        composable(Routes.LOGIN) { // login screen route
             LoginScreen(
-                onLoginSuccess = {
+                onLoginSuccess = { // navigate to home after successful login
                     navController.navigate(Routes.HOME) {
                         popUpTo(Routes.LOGIN) { inclusive = true }
                     }
                 }
             )
         }
-        composable(Routes.HOME) {
+        composable(Routes.HOME) { // home screen route
             HomeScreen(
                 onNearbyCourtsClick = { navController.navigate(Routes.NEARBY_COURTS) },
                 onCreateRunClick = { navController.navigate(Routes.CREATE_RUN) },
@@ -44,7 +44,7 @@ fun NavGraph(navController: NavHostController) {
                 runsViewModel = runsViewModel
             )
         }
-        composable(Routes.NEARBY_COURTS) {
+        composable(Routes.NEARBY_COURTS) { // nearby courts screen route
             NearbyCourtsScreen(
                 onBack = { navController.popBackStack() },
                 onCourtClick = { navController.navigate(Routes.COURT_DETAILS) },
@@ -52,21 +52,21 @@ fun NavGraph(navController: NavHostController) {
                 runsViewModel = runsViewModel
             )
         }
-        composable(Routes.CREATE_RUN) {
+        composable(Routes.CREATE_RUN) { // create run screen route
             CreateRunScreen(
-                onRunCreated = { navController.popBackStack() },
+                onRunCreated = { navController.popBackStack() }, // return to previous screen after creating a run
                 onBack = { navController.popBackStack() },
                 runsViewModel = runsViewModel
             )
         }
-        composable(
+        composable( // create details screen route with runid argument
             route = Routes.RUN_DETAILS,
             arguments = listOf(navArgument("runId") { type = NavType.StringType })
         ) { backStackEntry ->
             val runId = backStackEntry.arguments?.getString("runId") ?: ""
             val runs by runsViewModel.runs.collectAsState()
             val run = runs.find { it.id == runId }
-            if (run != null) {
+            if (run != null) { // only show screen if matching run exists
                 RunDetailsScreen(
                     run = run,
                     onBack = { navController.popBackStack() },
@@ -74,15 +74,15 @@ fun NavGraph(navController: NavHostController) {
                 )
             }
         }
-        composable(
+        composable( // run chat screen route with runid and courtname arguments
             route = Routes.RUN_CHAT,
             arguments = listOf(
                 navArgument("runId") { type = NavType.StringType },
                 navArgument("courtName") { type = NavType.StringType }
             )
         ) { backStackEntry ->
-            val runId = backStackEntry.arguments?.getString("runId") ?: ""
-            val courtName = java.net.URLDecoder.decode(
+            val runId = backStackEntry.arguments?.getString("runId") ?: "" // read runid argument
+            val courtName = java.net.URLDecoder.decode( // decode courtname because it may be url-encoded in navigation route
                 backStackEntry.arguments?.getString("courtName") ?: "", "UTF-8"
             )
             RunChatScreen(
@@ -91,13 +91,13 @@ fun NavGraph(navController: NavHostController) {
                 onBack = { navController.popBackStack() }
             )
         }
-        composable(Routes.COURT_DETAILS) {
+        composable(Routes.COURT_DETAILS) { // court details screen route
             CourtDetailsScreen(onBack = { navController.popBackStack() })
         }
-        composable(Routes.PROFILE) {
+        composable(Routes.PROFILE) { // profile screen route
             ProfileScreen(
                 onBack = { navController.popBackStack() },
-                onSignOut = {
+                onSignOut = { // navigate back to login after sign out
                     navController.navigate(Routes.LOGIN) {
                         popUpTo(0) { inclusive = true }
                     }

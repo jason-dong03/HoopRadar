@@ -10,8 +10,8 @@ object Routes {
     const val PROFILE = "profile"
     const val RUN_CHAT = "run_chat/{runId}/{courtName}"
 
-    fun runDetails(runId: String) = "run_details/$runId"
-    fun runChat(runId: String, courtName: String) = "run_chat/$runId/${courtName.encodeForNav()}"
+    fun runDetails(runId: String) = "run_details/$runId" // builds route string for selected run details
+    fun runChat(runId: String, courtName: String) = "run_chat/$runId/${courtName.encodeForNav()}" // builds route string for run chat screen
 
-    private fun String.encodeForNav() = java.net.URLEncoder.encode(this, "UTF-8")
+    private fun String.encodeForNav() = java.net.URLEncoder.encode(this, "UTF-8") // encodes string for navigation arguments
 }
